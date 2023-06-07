@@ -1,1 +1,3 @@
-export const localhost = "192.168.50.234";
+const API_ENDPOINT = "https://yummy-xe9c.onrender.com/api";
+
+export { API_ENDPOINT };

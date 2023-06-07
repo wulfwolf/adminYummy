@@ -1,11 +1,12 @@
 import axios from "axios";
-import { localhost } from "../../constant/index";
+
 import globalState from "../../effector/src/globalState";
+import { API_ENDPOINT } from "../../constant";
 
 export const getRecipesApi = async (accessToken) => {
   try {
     // axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-    const res = await axios.get(`http://${localhost}:5000/api/recipe/`);
+    const res = await axios.get(`http://${API_ENDPOINT}/recipe/`);
     if (res.status === 200) {
       return res.data;
     }
@@ -18,7 +19,7 @@ export const getIngredientsApi = async (accessToken) => {
 
   try {
     axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-    const res = await axios.get(`http://${localhost}:5000/api/ingredient/`);
+    const res = await axios.get(`http://${API_ENDPOINT}/ingredient/`);
     if (res.status === 200) {
       return res.data;
     }
@@ -31,7 +32,7 @@ export const createRecipesApi = async ({ accessToken, recipe }) => {
 
   try {
     axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-    const res = await axios.post(`http://${localhost}:5000/api/recipe/create`, {
+    const res = await axios.post(`http://${API_ENDPOINT}/recipe/create`, {
       recipeName: recipe.recipeName,
       desc: recipe.desc,
       preparations: recipe.preparations,
@@ -51,7 +52,7 @@ export const createRecipesApi = async ({ accessToken, recipe }) => {
 export const createIngredientsApi = async ({ accessToken, ingredient }) => {
   try {
     axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-    const res = await axios.post(`http://${localhost}:5000/api/ingredient/`, {
+    const res = await axios.post(`http://${API_ENDPOINT}/api/ingredient/`, {
       foodName: ingredient.foodName,
       img: ingredient.img,
       ScanCode: ingredient.ScanCode,
