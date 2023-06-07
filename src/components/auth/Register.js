@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { COLORS } from "../../assets/constants/index";
 import axios from "axios";
-import { localhost } from "../../constant";
+import { API_ENDPOINT } from "../../constant";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -20,13 +20,10 @@ export default function Register() {
   const signUpHandle = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.post(
-        `http://${localhost}:5000/api/admin/auth/register`,
-        {
-          email: email,
-          password: password,
-        }
-      );
+      const res = await axios.post(`${API_ENDPOINT}/admin/auth/register`, {
+        email: email,
+        password: password,
+      });
       if (res) {
         setIsLoading(false);
         console.log(res);

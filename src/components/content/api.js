@@ -6,7 +6,7 @@ import { API_ENDPOINT } from "../../constant";
 export const getRecipesApi = async (accessToken) => {
   try {
     // axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-    const res = await axios.get(`http://${API_ENDPOINT}/recipe/`);
+    const res = await axios.get(`${API_ENDPOINT}/recipe/`);
     if (res.status === 200) {
       return res.data;
     }
@@ -15,11 +15,9 @@ export const getRecipesApi = async (accessToken) => {
   }
 };
 export const getIngredientsApi = async (accessToken) => {
-  console.log(accessToken);
-
   try {
     axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-    const res = await axios.get(`http://${API_ENDPOINT}/ingredient/`);
+    const res = await axios.get(`${API_ENDPOINT}/ingredient/`);
     if (res.status === 200) {
       return res.data;
     }
@@ -32,7 +30,7 @@ export const createRecipesApi = async ({ accessToken, recipe }) => {
 
   try {
     axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-    const res = await axios.post(`http://${API_ENDPOINT}/recipe/create`, {
+    const res = await axios.post(`${API_ENDPOINT}/recipe/create`, {
       recipeName: recipe.recipeName,
       desc: recipe.desc,
       preparations: recipe.preparations,
@@ -52,7 +50,7 @@ export const createRecipesApi = async ({ accessToken, recipe }) => {
 export const createIngredientsApi = async ({ accessToken, ingredient }) => {
   try {
     axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-    const res = await axios.post(`http://${API_ENDPOINT}/api/ingredient/`, {
+    const res = await axios.post(`${API_ENDPOINT}/api/ingredient/`, {
       foodName: ingredient.foodName,
       img: ingredient.img,
       ScanCode: ingredient.ScanCode,

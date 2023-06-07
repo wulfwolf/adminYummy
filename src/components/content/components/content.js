@@ -13,7 +13,7 @@ function ContentComponent({ dataSource, title, columns, handleAdd }) {
           bordered
           columns={columns}
           dataSource={dataSource}
-          tableLayout="auto"
+          // tableLayout="auto"
         />
       </div>
 

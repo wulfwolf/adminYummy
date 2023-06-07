@@ -17,6 +17,8 @@ function Preparation() {
       setRes(res.recipes);
     }
   };
+  console.log(res);
+
   useEffect(() => {
     getRecipes();
   }, []);
@@ -34,7 +36,7 @@ function Preparation() {
     );
 
     setDataSource(convertData?.flat());
-  }, []);
+  }, [res]);
 
   const columns = [
     {

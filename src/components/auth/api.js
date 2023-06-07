@@ -5,11 +5,13 @@ import { API_ENDPOINT } from "../../constant";
 
 export const LoginApi = async (loginForm) => {
   try {
-    const res = await axios.post(`http://${API_ENDPOINT}/admin/auth/login`, {
+    const res = await axios.post(`${API_ENDPOINT}/admin/auth/login`, {
       email: loginForm.email,
       password: loginForm.password,
     });
     if (res.status === 200) {
+      console.log(res);
+
       globalState.action.LoginAction(res.data);
       return 1;
     }
