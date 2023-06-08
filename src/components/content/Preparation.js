@@ -6,18 +6,18 @@ import globalState from "../../effector/src/globalState";
 import Content from "./components/content";
 import ContentComponent from "./components/content";
 import { getRecipesApi } from "./api";
+import Edit from "./components/edit";
 function Preparation() {
-  const { accessToken } = useStore(globalState.$store);
-  const [isLoading, setIsLoading] = useState(false);
   const [res, setRes] = useState([]);
   const [dataSource, setDataSource] = useState();
+  const [visibleEdit, setVisibleEdit] = useState(false);
+  const [selected, setSelected] = useState();
   const getRecipes = async () => {
     const res = await getRecipesApi();
     if (res.success === true) {
       setRes(res.recipes);
     }
   };
-  console.log(res);
 
   useEffect(() => {
     getRecipes();
@@ -28,9 +28,9 @@ function Preparation() {
         _id: dataResItem?._id,
         recipeName: dataResItem?.recipeName,
         img: dataResItem?.img,
-        foodName: preparationItem?.ingredient?.foodName,
-        kcalRate: preparationItem?.ingredient?.kcalRate,
         preparationItem: dataResItem?.preparations?.length,
+        foodName: preparationItem?.ingredient?.foodName,
+        quantity: preparationItem?.quantity,
         indexData: index,
       }))
     );
@@ -100,8 +100,8 @@ function Preparation() {
         },
         {
           title: "Khối lượng",
-          dataIndex: "kcalRate",
-          key: "kcalRate",
+          dataIndex: "quantity",
+          key: "quantity",
         },
       ],
     },
@@ -109,9 +109,15 @@ function Preparation() {
       title: "Tùy chọn",
       key: "action",
       width: 150,
-      render: (record) => (
+      render: (value) => (
         <Space size="middle">
-          <Button type="primary" onClick={() => {}}>
+          <Button
+            type="primary"
+            onClick={() => {
+              setVisibleEdit(true);
+              setSelected(value);
+            }}
+          >
             Sửa
           </Button>
           <Popconfirm title="Xóa khâu chuẩn bị này này ?" placement="left">
@@ -126,11 +132,15 @@ function Preparation() {
 
   return (
     <div>
-      <ContentComponent
-        dataSource={dataSource}
-        title={"Khâu chuẩn bị"}
-        columns={columns}
-      />
+      {visibleEdit ? (
+        <Edit preparation={selected} />
+      ) : (
+        <ContentComponent
+          dataSource={dataSource}
+          title={"Khâu chuẩn bị"}
+          columns={columns}
+        />
+      )}
     </div>
   );
 }

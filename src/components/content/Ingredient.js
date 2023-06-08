@@ -1,47 +1,15 @@
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Divider,
-  Form,
-  Image,
-  Input,
-  message,
-  Modal,
-  Popconfirm,
-  Space,
-  Table,
-  Upload,
-} from "antd";
+import { Button, Image, Popconfirm, Space } from "antd";
 import React, { useEffect, useState } from "react";
-import {
-  createIngredientsApi,
-  createRecipesApi,
-  getIngredientsApi,
-  getRecipesApi,
-} from "./api";
+import { getIngredientsApi } from "./api";
 import { useStore } from "effector-react";
 import globalState from "../../effector/src/globalState";
-import Content from "./components/content";
 import ContentComponent from "./components/content";
+import Edit from "./components/edit";
 function Ingredient() {
-  // const [image, setImage] = useState(null);
   const { accessToken } = useStore(globalState.$store);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [dataAddIngredientForm, setDataAddIngredientForm] = useState({
-    foodName: "",
-    img: "",
-    ScanCode: "",
-    unit: "",
-  });
-  const [dataUpdateIngredientForm, setDataUpdateIngredientForm] = useState({
-    foodName: "",
-    img: "",
-    ScanCode: "",
-    unit: "",
-  });
-
   const [ingredients, setIngredients] = useState([]);
+  const [visibleEdit, setVisibleEdit] = useState(false);
+  const [selected, setSelected] = useState();
 
   const getIngredients = async () => {
     const res = await getIngredientsApi(accessToken);
@@ -49,17 +17,9 @@ function Ingredient() {
       setIngredients(res.ingredient);
     }
   };
-
   useEffect(() => {
     getIngredients();
-  }, [getIngredients]);
-
-  const ingredientsData =
-    ingredients &&
-    ingredients.length > 0 &&
-    ingredients.map((ingredients) => {
-      return { ...ingredients, key: ingredients.id };
-    });
+  }, []);
 
   const columns = [
     {
@@ -88,16 +48,13 @@ function Ingredient() {
           <Button
             type="primary"
             onClick={() => {
-              // handleShowUpdateIngredientModal(record);
+              setVisibleEdit(true);
+              setSelected(record);
             }}
           >
             Sửa
           </Button>
-          <Popconfirm
-            title="Xóa thực phẩm này ?"
-            placement="left"
-            // onConfirm={() => handleDeleteIngredient(record)}
-          >
+          <Popconfirm title="Xóa thực phẩm này ?" placement="left">
             <Button type="primary" danger>
               Xóa
             </Button>
@@ -108,13 +65,17 @@ function Ingredient() {
   ];
 
   return (
-    <>
-      <ContentComponent
-        dataSource={ingredients}
-        title={"Thực phẩm"}
-        columns={columns}
-      />
-    </>
+    <div>
+      {visibleEdit ? (
+        <Edit ingredient={selected} />
+      ) : (
+        <ContentComponent
+          dataSource={ingredients}
+          title={"Thực phẩm"}
+          columns={columns}
+        />
+      )}
+    </div>
   );
 }
 

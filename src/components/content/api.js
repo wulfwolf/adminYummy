@@ -26,8 +26,6 @@ export const getIngredientsApi = async (accessToken) => {
   }
 };
 export const createRecipesApi = async ({ accessToken, recipe }) => {
-  console.log(recipe);
-
   try {
     axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
     const res = await axios.post(`${API_ENDPOINT}/recipe/create`, {
@@ -41,7 +39,7 @@ export const createRecipesApi = async ({ accessToken, recipe }) => {
       ingredients: recipe.ingredients,
     });
     if (res.status === 200) {
-      alert("Reciped Added successfully!");
+      alert("Recipe Added successfully!");
     }
   } catch (error) {
     console.log(error);
@@ -57,7 +55,25 @@ export const createIngredientsApi = async ({ accessToken, ingredient }) => {
       unit: ingredient.unit,
     });
     if (res.status === 200) {
-      alert("Reciped Added successfully!");
+      alert("ingredient Added successfully!");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const editRecipeApi = async ({ accessToken, recipe }) => {
+  try {
+    axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+    const res = await axios.put(`${API_ENDPOINT}/recipe/${recipe?._id}`, {
+      recipeName: recipe?.recipeName,
+      desc: recipe?.desc,
+      img: recipe?.img,
+      instruction: recipe?.instruction,
+      meal: recipe?.meal,
+      warningTags: recipe?.warningTags,
+    });
+    if (res.status === 200) {
+      alert("Recipe edited successfully!");
     }
   } catch (error) {
     console.log(error);

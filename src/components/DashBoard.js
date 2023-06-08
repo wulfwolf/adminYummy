@@ -10,6 +10,7 @@ import Recipe2 from "./content/Recipe";
 import { AppleOutlined, FireOutlined } from "@ant-design/icons";
 import Recipe from "./content/Recipe";
 import Preparation from "./content/Preparation";
+import Edit from "./content/components/edit";
 const { Header, Content, Footer, Sider } = Layout;
 
 const DashBoard = () => {
@@ -76,10 +77,6 @@ const DashBoard = () => {
             marginTop: 64,
           }}
         >
-          <Breadcrumb style={{ margin: "16px 0" }}>
-            <Breadcrumb.Item>DashBoard</Breadcrumb.Item>
-            <Breadcrumb.Item>Recipe</Breadcrumb.Item>
-          </Breadcrumb>
           <Layout style={{ padding: "24px 0", background: "white" }}>
             <Sider style={{ background: "white" }} width={200}>
               <Menu
@@ -94,6 +91,7 @@ const DashBoard = () => {
               <Routes>
                 <Route path="/" element={<Navigate to="recipe" />} />
                 <Route path="/recipe" element={<Recipe />} />
+                <Route path="/recipe/edit" element={<Edit />} />
                 <Route path="/ingredient" element={<Ingredient />} />
                 <Route path="/preparation" element={<Preparation />} />
               </Routes>
