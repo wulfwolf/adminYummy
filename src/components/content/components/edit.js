@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -13,18 +13,43 @@ import {
 } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import BreadcrumbComponent from "./breadcrumb";
-import { editRecipeApi } from "../api";
+import {
+  createIngredientsApi,
+  editIngredientApi,
+  editRecipeApi,
+  getIngredientsApi,
+  updatePreparationApi,
+} from "../api";
 import { useStore } from "effector-react";
 import globalState from "../../../effector/src/globalState";
 import { createRecipesApi } from "../api";
+import { renderItem } from "../../../utils/function";
 const { TextArea } = Input;
-function Edit({ recipe, preparation, ingredient, addRecipe }) {
+function Edit({
+  recipe,
+  preparation,
+  ingredient,
+  addRecipe,
+  addIngredient,
+  addPreparation,
+}) {
   const { accessToken } = useStore(globalState.$store);
+  const [ingredients, setIngredients] = useState([]);
   const formItemLayout = {
     wrapperCol: {
       sm: { span: 24 },
     },
   };
+  const getIngredients = async () => {
+    const res = await getIngredientsApi(accessToken);
+    if (res.success === true) {
+      setIngredients(res.ingredient);
+    }
+  };
+  useEffect(() => {
+    getIngredients();
+  }, []);
+
   const onFinish = async (value) => {
     if (recipe && !addRecipe) {
       await editRecipeApi({
@@ -32,9 +57,26 @@ function Edit({ recipe, preparation, ingredient, addRecipe }) {
         accessToken,
       });
     } else if (recipe && addRecipe) {
-      await createRecipesApi({ accessToken, ...value });
+      await createRecipesApi({ recipe: value, accessToken });
     }
+    if (ingredient && !addIngredient) {
+      await editIngredientApi({
+        ingredient: { ...value, _id: ingredient?._id },
+        accessToken,
+      });
+    } else if (ingredient && addIngredient) {
+      await createIngredientsApi({ ingredient: value, accessToken });
+    }
+    if (preparation) {
+      updatePreparationApi({
+        accessToken,
+        preparation: value,
+        prepareID: preparation?._id,
+      });
+    }
+    console.log(value);
   };
+  console.log(ingredients);
 
   if (recipe) {
     return (
@@ -176,32 +218,47 @@ function Edit({ recipe, preparation, ingredient, addRecipe }) {
           wrapperCol={{ span: 14 }}
           layout="horizontal"
           style={{ maxWidth: 600 }}
+          initialValues={{
+            recipeName: preparation?.recipeName,
+            img: preparation?.img,
+            preparations: renderItem(preparation),
+          }}
+          onFinish={onFinish}
         >
-          <Form.Item label="Tên công thức">
+          <Form.Item label="Tên công thức" name={"recipeName"}>
             <Input value={preparation?.recipeName} disabled />
           </Form.Item>
-          <Form.Item label="Ảnh">
+          <Form.Item label="Ảnh" name={"img"}>
             <Image width={200} src={preparation?.img} />
           </Form.Item>
           <Form.Item label="Khâu chuẩn bị">
             <Form.List name="preparations">
               {(fields, { add, remove }) => (
                 <>
-                  {fields.map(({ key, name, ...restField }) => (
-                    <Space
-                      key={key}
-                      style={{ display: "flex", marginBottom: 8 }}
-                      align="baseline"
-                    >
-                      <Form.Item {...restField} name={[name, "first"]}>
-                        <Input placeholder="Thực phẩm" />
-                      </Form.Item>
-                      <Form.Item {...restField} name={[name, "last"]}>
-                        <Input placeholder="Khối lượng" />
-                      </Form.Item>
-                      <MinusCircleOutlined onClick={() => remove(name)} />
-                    </Space>
-                  ))}
+                  {fields.map(({ key, name, ...restField }) => {
+                    return (
+                      <Space
+                        key={key}
+                        style={{ display: "flex", marginBottom: 8 }}
+                        align="baseline"
+                      >
+                        <Form.Item name={[name, "_id"]}>
+                          <Select style={{ width: 150 }}>
+                            {ingredients.map((i, index) => (
+                              <Select.Option value={i._id} key={index}>
+                                {i.foodName}
+                              </Select.Option>
+                            ))}
+                          </Select>
+                        </Form.Item>
+                        <Form.Item {...restField} name={[name, "quantity"]}>
+                          <Input placeholder="Khối lượng" />
+                        </Form.Item>
+
+                        <MinusCircleOutlined onClick={() => remove(name)} />
+                      </Space>
+                    );
+                  })}
                   <Form.Item>
                     <Button
                       type="dashed"
@@ -216,8 +273,10 @@ function Edit({ recipe, preparation, ingredient, addRecipe }) {
               )}
             </Form.List>
           </Form.Item>
-          <Form.Item label="Cập nhật">
-            <Button>Xác nhận</Button>
+          <Form.Item label={addPreparation ? "Thêm" : "Cập nhật"}>
+            <Button type="primary" htmlType="submit">
+              {`${addPreparation ? "Thêm" : "Cập nhật"}`}
+            </Button>
           </Form.Item>
           <Form.Item label="Hủy">
             <Button>Hủy</Button>
@@ -230,31 +289,41 @@ function Edit({ recipe, preparation, ingredient, addRecipe }) {
       <>
         <BreadcrumbComponent ingredient={ingredient} />
         <Form
+          onFinish={onFinish}
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 14 }}
           layout="horizontal"
           style={{ maxWidth: 600 }}
+          initialValues={{
+            foodName: ingredient?.foodName,
+            img: ingredient?.img,
+            ScanCode: ingredient?.ScanCode,
+            unit: ingredient?.unit,
+            kcalRate: ingredient?.kcalRate,
+          }}
         >
-          <Form.Item label="Tên thực phẩm">
+          <Form.Item label="Tên thực phẩm" name={"foodName"}>
             <Input value={ingredient?.foodName} />
           </Form.Item>
-          <Form.Item label="URL ảnh">
+          <Form.Item label="URL ảnh" name={"img"}>
             <Input value={ingredient?.img} />
           </Form.Item>
-          <Form.Item label="ScanCode">
+          <Form.Item label="ScanCode" name={"ScanCode"}>
             <Input value={ingredient?.ScanCode} />
           </Form.Item>
-          <Form.Item label="Đơn vị">
+          <Form.Item label="Đơn vị" name={"unit"}>
             <Radio.Group>
               <Radio value="gr"> gr </Radio>
               <Radio value="ml"> ml </Radio>
             </Radio.Group>
           </Form.Item>
-          <Form.Item label="Tỉ lệ calo">
+          <Form.Item label="Tỉ lệ calo" name={"kcalRate"}>
             <Input value={ingredient?.kcalRate} />
           </Form.Item>
-          <Form.Item label="Cập nhật">
-            <Button>Xác nhận</Button>
+          <Form.Item label={addIngredient ? "Thêm" : "Cập nhật"}>
+            <Button type="primary" htmlType="submit">
+              {`${addIngredient ? "Thêm" : "Cập nhật"}`}
+            </Button>
           </Form.Item>
           <Form.Item label="Hủy">
             <Button>Hủy</Button>

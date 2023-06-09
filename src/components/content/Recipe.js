@@ -6,7 +6,6 @@ import Edit from "./components/edit";
 import { checkTags } from "../../utils/function";
 function Recipe() {
   const [visibleEdit, setVisibleEdit] = useState(false);
-  const [selected, setSelected] = useState();
   const [res, setRes] = useState([]);
   const [dataSource, setDataSource] = useState();
   const [tmp, setTmp] = useState([]);
@@ -185,7 +184,6 @@ function Recipe() {
 
   const handleEditRecipe = (record) => {
     setVisibleEdit(true);
-    // setSelected(record);
     setTmp(res?.find((tmp) => tmp._id === record._id));
   };
   return (

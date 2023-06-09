@@ -48,11 +48,12 @@ export const createRecipesApi = async ({ accessToken, recipe }) => {
 export const createIngredientsApi = async ({ accessToken, ingredient }) => {
   try {
     axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-    const res = await axios.post(`${API_ENDPOINT}/api/ingredient/`, {
+    const res = await axios.post(`${API_ENDPOINT}/ingredient/`, {
       foodName: ingredient.foodName,
       img: ingredient.img,
       ScanCode: ingredient.ScanCode,
       unit: ingredient.unit,
+      kcalRate: ingredient.kcalRate,
     });
     if (res.status === 200) {
       alert("ingredient Added successfully!");
@@ -71,7 +72,50 @@ export const editRecipeApi = async ({ accessToken, recipe }) => {
       instruction: recipe?.instruction,
       meal: recipe?.meal,
       warningTags: recipe?.warningTags,
+      preparations: recipe?.preparations,
     });
+    if (res.status === 200) {
+      alert("Recipe edited successfully!");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const updatePreparationApi = async ({
+  accessToken,
+  preparation,
+  prepareID,
+}) => {
+  const tmp = preparation?.preparations.map((i) => ({
+    quantity: i?.quantity,
+    ingredient: i?._id,
+  }));
+
+  try {
+    axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+    const res = await axios.put(`${API_ENDPOINT}/recipe/${prepareID}`, {
+      preparations: tmp,
+    });
+    if (res.status === 200) {
+      alert("preparation edited successfully!");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const editIngredientApi = async ({ accessToken, ingredient }) => {
+  try {
+    axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+    const res = await axios.put(
+      `${API_ENDPOINT}/ingredient/${ingredient?._id}`,
+      {
+        foodName: ingredient?.foodName,
+        img: ingredient?.img,
+        ScanCode: ingredient?.ScanCode,
+        unit: ingredient?.unit,
+        kcalRate: ingredient?.kcalRate,
+      }
+    );
     if (res.status === 200) {
       alert("Recipe edited successfully!");
     }

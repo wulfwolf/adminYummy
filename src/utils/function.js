@@ -14,3 +14,14 @@ export const checkTags = (tag) => {
       break;
   }
 };
+export const renderItem = (preparation) => {
+  const tmp = [];
+  tmp.push(
+    preparation?.preparations.map((prepration) => ({
+      _id: prepration?.ingredient?._id,
+      quantity: prepration?.quantity,
+      ingredient: prepration?.ingredient?._id,
+    }))
+  );
+  return tmp[0];
+};

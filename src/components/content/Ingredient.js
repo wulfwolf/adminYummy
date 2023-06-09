@@ -9,8 +9,8 @@ function Ingredient() {
   const { accessToken } = useStore(globalState.$store);
   const [ingredients, setIngredients] = useState([]);
   const [visibleEdit, setVisibleEdit] = useState(false);
-  const [selected, setSelected] = useState();
-
+  const [selected, setSelected] = useState([]);
+  const [add, setAdd] = useState(false);
   const getIngredients = async () => {
     const res = await getIngredientsApi(accessToken);
     if (res.success === true) {
@@ -22,6 +22,11 @@ function Ingredient() {
   }, []);
 
   const columns = [
+    {
+      title: "id",
+      dataIndex: "_id",
+      key: "_id",
+    },
     {
       title: "Tên thực phẩm",
       dataIndex: "foodName",
@@ -67,12 +72,16 @@ function Ingredient() {
   return (
     <div>
       {visibleEdit ? (
-        <Edit ingredient={selected} />
+        <Edit ingredient={selected} addIngredient={add} />
       ) : (
         <ContentComponent
           dataSource={ingredients}
           title={"Thực phẩm"}
           columns={columns}
+          handleAdd={() => {
+            setAdd(true);
+            setVisibleEdit(true);
+          }}
         />
       )}
     </div>

@@ -11,29 +11,42 @@ function Preparation() {
   const [res, setRes] = useState([]);
   const [dataSource, setDataSource] = useState();
   const [visibleEdit, setVisibleEdit] = useState(false);
-  const [selected, setSelected] = useState();
+  const [selected, setSelected] = useState([]);
+  const [tmp, setTmp] = useState([]);
+  const [add, setAdd] = useState(false);
   const getRecipes = async () => {
     const res = await getRecipesApi();
     if (res.success === true) {
       setRes(res.recipes);
     }
   };
-
   useEffect(() => {
     getRecipes();
   }, []);
   useEffect(() => {
-    const convertData = res?.map((dataResItem) =>
-      dataResItem?.preparations?.map((preparationItem, index) => ({
-        _id: dataResItem?._id,
-        recipeName: dataResItem?.recipeName,
-        img: dataResItem?.img,
-        preparationItem: dataResItem?.preparations?.length,
-        foodName: preparationItem?.ingredient?.foodName,
-        quantity: preparationItem?.quantity,
-        indexData: index,
-      }))
-    );
+    const convertData = res?.map((dataResItem) => {
+      if (dataResItem?.preparations.length === 0) {
+        return {
+          _id: dataResItem?._id,
+          recipeName: dataResItem?.recipeName,
+          img: dataResItem?.img,
+          preparationItem: 1,
+          foodName: "",
+          quantity: 0,
+          indexData: 0,
+        };
+      } else {
+        return dataResItem?.preparations?.map((preparationItem, index) => ({
+          _id: dataResItem?._id,
+          recipeName: dataResItem?.recipeName,
+          img: dataResItem?.img,
+          preparationItem: dataResItem?.preparations?.length,
+          foodName: preparationItem?.ingredient?.foodName,
+          quantity: preparationItem?.quantity,
+          indexData: index,
+        }));
+      }
+    });
 
     setDataSource(convertData?.flat());
   }, [res]);
@@ -109,36 +122,52 @@ function Preparation() {
       title: "Tùy chọn",
       key: "action",
       width: 150,
-      render: (value) => (
-        <Space size="middle">
-          <Button
-            type="primary"
-            onClick={() => {
-              setVisibleEdit(true);
-              setSelected(value);
-            }}
-          >
-            Sửa
-          </Button>
-          <Popconfirm title="Xóa khâu chuẩn bị này này ?" placement="left">
-            <Button type="primary" danger>
-              Xóa
-            </Button>
-          </Popconfirm>
-        </Space>
-      ),
+      render: (value, row, index) => {
+        const obj = {
+          children: (
+            <Space size="middle">
+              <Button
+                type="primary"
+                onClick={() => {
+                  setVisibleEdit(true);
+                  setTmp(res?.find((tmp) => tmp._id === value._id));
+                }}
+              >
+                Sửa
+              </Button>
+              <Popconfirm
+                title="Xóa công thức này ?"
+                placement="left"
+                // onConfirm={() => handleDeleteRecipe(record)}
+              >
+                <Button type="primary" danger>
+                  Xóa
+                </Button>
+              </Popconfirm>
+            </Space>
+          ),
+          props: {},
+        };
+        obj.props.rowSpan =
+          row?.indexData % row?.preparationItem ? 0 : row?.preparationItem;
+        return obj;
+      },
     },
   ];
 
   return (
     <div>
       {visibleEdit ? (
-        <Edit preparation={selected} />
+        <Edit preparation={tmp} addPreparation={add} />
       ) : (
         <ContentComponent
           dataSource={dataSource}
           title={"Khâu chuẩn bị"}
           columns={columns}
+          handleAdd={() => {
+            setAdd(true);
+            setVisibleEdit(true);
+          }}
         />
       )}
     </div>
